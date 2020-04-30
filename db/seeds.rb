@@ -17,8 +17,21 @@ end
 end
 
 # Création 100 fake RDV
-100.times do
-  appointment = Appointment.create!(date: Faker::Time.forward(days: 150, period: :day), doctor: Doctor.all.sample, patient: Patient.all.sample, city: City.all.sample)
+#100.times do
+#  appointment = Appointment.create!(date: Faker::Time.forward(days: 150, period: :day), doctor: Doctor.all.sample, patient: Patient.all.sample, city: City.all.sample)
+#end
+
+# Création de 30 fakes RDV où la appointment.city == doctor.city == patient.city
+30.times do
+  n = rand(1..City.all.count)
+  appointment = Appointment.create
+  appointment.date = Faker::Time.forward(days: rand(1..365), period: :day, format: :long)
+  appointment.city_id = n
+  what_doc = Doctor.where("city_id like ?", "%#{appointment.city_id}%")
+  appointment.doctor = what_doc.sample
+  what_pat = Patient.where("city_id like ?", "%#{appointment.city_id}%")
+  appointment.patient = what_pat.sample
+  appointment.save
 end
 
 # Création 16 spécialités (à lancer une seule fois)
@@ -31,3 +44,5 @@ end
 30.times do
   specialty_doctor = SpecialtyDoctor.create!(doctor: Doctor.all.sample, specialty: Specialty.all.sample)
 end
+
+
